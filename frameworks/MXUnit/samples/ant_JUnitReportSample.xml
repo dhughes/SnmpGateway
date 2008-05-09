@@ -1,0 +1,37 @@
+<?xml version="1.0" encoding="ISO-8859-1"?>
+
+<project name="Sample" basedir="." default="main">
+
+	<mkdir dir="testresults" />
+
+	<target name="main" depends="runtests,junitreport" description="Main target for running the tests." />
+
+	<target name="setprops">
+		<property name="testroot" value="c:\inetpub\wwwroot\mxunit\tests\framework" />
+		<property name="componentPath" value="mxunit.tests.framework" />
+		<property name="server" value="localhost" />
+		<property name="port" value="80" />
+	</target>
+
+	<target name="runtests" description="Make output directories and run the MXUnit task" depends="setprops">
+		<taskdef name="mxunittask" classname="org.mxunit.ant.MXUnitAntTask" classpath="../ant/lib/mxunit-ant.jar" />
+		<mxunittask server="${server}" port="${port}" outputdir="testresults" verbose="true">
+			<directory path="${testroot}" recurse="false" packageName="${componentPath}" componentPath="${componentPath}" />
+		</mxunittask>
+	</target>
+
+
+
+	<target name="junitreport" description="Create a report for the rest result" depends="setprops">
+		<mkdir dir="junithtml" />
+		<junitreport todir="junithtml">
+			<fileset dir="testresults">
+				<include name="*.xml" />
+			</fileset>
+			<report format="frames" todir="junithtml" styledir="../ant/xsl" />
+		</junitreport>
+	</target>
+
+</project>
+
+
