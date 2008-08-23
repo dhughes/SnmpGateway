@@ -70,7 +70,7 @@ public class SnmpGatewayHelper implements GatewayHelper {
 	 */
 	public SnmpGatewayResponse snmpGatewayGet(SnmpGatewayCredentials cred,
 											  SnmpGatewayVarbinds vbs) throws IOException {
-		
+
 		return this.snmpGatewayRequest("GET", cred, vbs);
 	}
 	
