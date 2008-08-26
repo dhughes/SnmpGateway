@@ -47,13 +47,9 @@ public class SnmpGateway implements Gateway {
 	      this.gatewayID = gatewayID;
 	      this.config = config;
 	      this.gatewayServices = GatewayServices.getGatewayServices();
-	      System.out.println(this.gatewayServices.getClass());  //DOUG - this works
-	      this.logger = this.gatewayServices.getLogger();		//DOUG - this NPE inside of GatewayServices
-	      														//DOUG - I tried adding 'logging' jars...
-	      														//DOUG - but this NPEs when run from command line
-	                                                            //DOUG - or from eclipse debug
+	      this.logger = this.gatewayServices.getLogger();
 	      this.status = Gateway.RUNNING;
-	      this.logger.info("Instantiating " + this.gatewayID);
+	      this.logger.info("Instantiating Gateway: " + this.gatewayID);
 	}
 
 	/**
@@ -76,7 +72,27 @@ public class SnmpGateway implements Gateway {
      * @return one of STARTING, RUNNING, STOPPING, STOPPED, FAILED.
      */
 	public int getStatus() {
-		this.logger.info("Reporting Status " + this.status);
+		String s = "UNKNOWN";
+		
+		switch(this.status) {
+		case Gateway.FAILED:
+			s = "FAILED";
+			break;
+		case Gateway.RUNNING:
+			s = "RUNNING";
+			break;
+		case Gateway.STARTING:
+			s = "STARTING";
+			break;
+		case Gateway.STOPPED:
+			s = "STOPPED";
+			break;
+		case Gateway.STOPPING:
+			s = "STOPPING";
+			break;
+		}
+		
+		this.logger.info("Reporting Gateway Status: " + s);
 		return this.status;
 	}
 	
@@ -128,7 +144,7 @@ public class SnmpGateway implements Gateway {
 	 */
 	public void start() {
 		this.status = Gateway.RUNNING;
-		this.logger.info("Starting " + this.gatewayID);
+		this.logger.info("Starting Gateway: " + this.gatewayID);
 	}
 	
 	/**
@@ -136,31 +152,9 @@ public class SnmpGateway implements Gateway {
 	 */
 	public void stop() {
 		this.status = Gateway.STOPPED;
-		this.logger.info("Stopping " + this.gatewayID);
+		this.logger.info("Stopping Gateway: " + this.gatewayID);
 	}
 
-	
-	
-	/**
-	 * convenience method to make a set of SNMP Credentials
-	 * 
-	 * @param target the IP Address of the target SNMP Agent
-	 * @param community the community string to use in requests made on the
-	 *        target SNMP Agent
-	 * @return an instance of SnmpGatewayCredentials for use with the supplied
-	 *        target SNMP Agent.
-	 */
-	public SnmpGatewayCredentials SnmpGatewayMakeCredentials(String target, String community) {
-		return new SnmpGatewayCredentials(target, community);
-	}
-	
-	/**
-	 * convenience method to make an instance of SnmpGatewayVarbinds
-	 * @return an intance of SnmpGatewayVarbinds containing no varbinds
-	 */
-	public SnmpGatewayVarbinds SnmpGatewayMakeVarbinds() {
-		return new SnmpGatewayVarbinds();
-	}
 	
 	/**
 	 * @param args not called with any parameters!

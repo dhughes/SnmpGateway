@@ -29,7 +29,7 @@ public class SnmpGatewayHelper implements GatewayHelper {
 		
 		this.gatewayServices = GatewayServices.getGatewayServices();
 	    this.logger = this.gatewayServices.getLogger(this.gatewayID + "-helper");
-	    this.logger.info("Instantiating " + this.gatewayID);
+	    this.logger.info("Instantiating " + this.gatewayID + "-helper");
 	}
 	
 	/**
@@ -124,5 +124,25 @@ public class SnmpGatewayHelper implements GatewayHelper {
 		
 		return(args);
 	}
+
+	/**
+	 * convenience method to make a set of SNMP Credentials
+	 * 
+	 * @param target the IP Address of the target SNMP Agent
+	 * @param community the community string to use in requests made on the
+	 *        target SNMP Agent
+	 * @return an instance of SnmpGatewayCredentials for use with the supplied
+	 *        target SNMP Agent.
+	 */
+	public SnmpGatewayCredentials createSnmpGatewayCredentials(String target, String community) {
+		return new SnmpGatewayCredentials(target, community);
+	}
 	
+	/**
+	 * convenience method to make an instance of SnmpGatewayVarbinds
+	 * @return an intance of SnmpGatewayVarbinds containing no varbinds
+	 */
+	public SnmpGatewayVarbinds createSnmpGatewayVarbinds() {
+		return new SnmpGatewayVarbinds();
+	}
 }
