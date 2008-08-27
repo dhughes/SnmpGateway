@@ -14,11 +14,11 @@
 <cfdump var="#credentials#" />
 
 <!--- create the varbinds --->
-<cfset varbinds = snmpHelper.createSnmpGatewayVarbinds() />
+<cfset varbinds = ArrayNew(1) />
 
-<cfset varbinds.add("1.3.6.1.2.1.1.3.0") />
-<cfset varbinds.add("1.3.6.1.2.1.1") />
-<cfset varbinds.add("1.3.6.1.2.1.1.5.0") />
+<cfset ArrayAppend(varbinds, "1.3.6.1.2.1.1.3.0") />
+<cfset ArrayAppend(varbinds, "1.3.6.1.2.1.1") />
+<cfset ArrayAppend(varbinds, "1.3.6.1.2.1.1.5.0") />
 
 <!--- dump the varbinds --->
 <cfdump var="#varbinds#" />
