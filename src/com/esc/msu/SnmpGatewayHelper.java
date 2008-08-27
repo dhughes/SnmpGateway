@@ -42,9 +42,9 @@ public class SnmpGatewayHelper implements GatewayHelper {
 	 * 
 	 * @throws IOException
 	 */
-	private SnmpGatewayResponse snmpGatewayRequest(String type,
+	private SnmpGatewayResponse snmpRequest(String type,
 												   SnmpGatewayCredentials cred,
-												   SnmpGatewayVarbinds vbs) throws IOException {
+												   ArrayList<String> vbs) throws IOException {
 
 		ArrayList<String> args = extractArgs(type, cred, vbs);
 		
@@ -68,10 +68,10 @@ public class SnmpGatewayHelper implements GatewayHelper {
 	 * 
 	 * @throws IOException
 	 */
-	public SnmpGatewayResponse snmpGatewayGet(SnmpGatewayCredentials cred,
-											  SnmpGatewayVarbinds vbs) throws IOException {
+	public SnmpGatewayResponse get(SnmpGatewayCredentials cred,
+											  ArrayList<String> vbs) throws IOException {
 
-		return this.snmpGatewayRequest("GET", cred, vbs);
+		return this.snmpRequest("GET", cred, vbs);
 	}
 	
 	
@@ -84,10 +84,10 @@ public class SnmpGatewayHelper implements GatewayHelper {
 	 * 
 	 * @throws IOException
 	 */
-	public SnmpGatewayResponse snmpGatewayGetNext(SnmpGatewayCredentials cred,
-			  									  SnmpGatewayVarbinds vbs) throws IOException {
+	public SnmpGatewayResponse getNext(SnmpGatewayCredentials cred,
+												ArrayList<String> vbs) throws IOException {
 		
-		return this.snmpGatewayRequest("GETNEXT", cred, vbs);
+		return this.snmpRequest("GETNEXT", cred, vbs);
 	}
 	
 
@@ -102,7 +102,7 @@ public class SnmpGatewayHelper implements GatewayHelper {
 	 *         to pass to SnmpRequest
 	 */
 	private ArrayList<String> extractArgs(String pdu, SnmpGatewayCredentials cred, 	
-										   SnmpGatewayVarbinds vbs) {
+										   ArrayList<String> vbs) {
 		ArrayList<String> args = new ArrayList<String>();
 		
 		// turn off log4j output
@@ -134,15 +134,8 @@ public class SnmpGatewayHelper implements GatewayHelper {
 	 * @return an instance of SnmpGatewayCredentials for use with the supplied
 	 *        target SNMP Agent.
 	 */
-	public SnmpGatewayCredentials createSnmpGatewayCredentials(String target, String community) {
+	public SnmpGatewayCredentials createCredentials(String target, String community) {
 		return new SnmpGatewayCredentials(target, community);
 	}
 	
-	/**
-	 * convenience method to make an instance of SnmpGatewayVarbinds
-	 * @return an intance of SnmpGatewayVarbinds containing no varbinds
-	 */
-	public SnmpGatewayVarbinds createSnmpGatewayVarbinds() {
-		return new SnmpGatewayVarbinds();
-	}
 }

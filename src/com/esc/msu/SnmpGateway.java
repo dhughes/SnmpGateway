@@ -162,15 +162,15 @@ public class SnmpGateway implements Gateway {
 	public static void main(String[] args) {
 		
 		SnmpGateway sg = new SnmpGateway("ColdFusion SnmpGateway", null);
-		SnmpGatewayCredentials cred = sg.SnmpGatewayMakeCredentials("192.168.1.220",
+		SnmpGatewayCredentials cred = sg.createCredentials("192.168.1.220",
 				                                                 "public");
 		cred.setTargetPort(1161);
-		SnmpGatewayVarbinds vbl = sg.SnmpGatewayMakeVarbinds();
+		ArrayList<String> vbl = new ArrayList<String>();
 		vbl.add("1.3.6.1.2.1.1.3.0");
 		vbl.add("1.3.6.1.2.1.1");
 		
 		try {
-			SnmpGatewayResponse sgr = sg.snmpGatewayGet(cred, vbl);
+			SnmpGatewayResponse sgr = sg.get(cred, vbl);
 			System.out.println(sgr.getSynopsis());
 		} catch (IOException e) {
 			// TODO Auto-generated catch block
@@ -183,7 +183,7 @@ public class SnmpGateway implements Gateway {
 		vbl.add("1.3.6.1.2.1.8");
 		
 		try {
-			SnmpGatewayResponse sgr = sg.snmpGatewayGetNext(cred, vbl);
+			SnmpGatewayResponse sgr = sg.getNext(cred, vbl);
 			System.out.println(sgr.getSynopsis());
 		} catch (IOException e) {
 			// TODO Auto-generated catch block

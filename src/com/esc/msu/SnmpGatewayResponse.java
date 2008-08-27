@@ -4,6 +4,8 @@
 package com.esc.msu;
 
 import org.snmp4j.PDU;
+
+import java.util.ArrayList;
 import java.util.Date;
 
 /**
@@ -16,7 +18,7 @@ public class SnmpGatewayResponse {
 	private final long requestDuration;
 	private final String target;
 	private final PDU response;	
-	private final SnmpGatewayVarbinds requestVbs;
+	private final ArrayList<String> requestVbs;
 	
 	/**
 	 * construct a response for an SNMP gateway request
@@ -32,14 +34,14 @@ public class SnmpGatewayResponse {
 	public SnmpGatewayResponse(String requestType,
 							   long requestStart, long requestDuration,
 			                   String target,
-			                   SnmpGatewayVarbinds requestVbs,
+			                   ArrayList<String> requestVbs,
 			                   PDU response) {
 		
 		this.requestType = new String(requestType);
 		this.requestStart = new Date(requestStart);
 		this.requestDuration = requestDuration;
 		this.target = new String(target);
-		this.requestVbs = (SnmpGatewayVarbinds )requestVbs.clone();
+		this.requestVbs = (ArrayList<String> )requestVbs.clone();
 		this.response = response;	
 	}
 
