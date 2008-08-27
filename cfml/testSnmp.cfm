@@ -8,7 +8,7 @@
 <cfdump var="#snmpHelper#" />
 
 <!--- create the credentials --->
-<cfset credentials = snmpHelper.createSnmpGatewayCredentials("192.168.1.1", "public") />
+<cfset credentials = snmpHelper.createCredentials("192.168.1.1", "public") />
 
 <!--- dump the credentials --->
 <cfdump var="#credentials#" />
@@ -24,7 +24,7 @@
 <cfdump var="#varbinds#" />
 
 <!--- do a get request --->
-<cfset response = snmpHelper.snmpGatewayGet(credentials, varbinds) />
+<cfset response = snmpHelper.get(credentials, varbinds) />
 
 <!--- dump the response --->
 <cfdump var="#response#" />
@@ -32,7 +32,7 @@
 <!--- output details --->
 <cfoutput>
 	<p>
-		durration: #response.getDuration()#<br />
+		duration: #response.getDuration()#<br />
 		errorIndex: #response.getErrorIndex()#<br />
 		errorStatus: #response.getErrorStatus()#<br />
 		requestType: #response.getRequestType()#<br />
