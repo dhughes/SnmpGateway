@@ -6,4 +6,39 @@
 
 <!--- dump the snmp object --->
 <cfdump var="#snmpHelper#" />
- 
+
+<!--- create the credentials --->
+<cfset credentials = snmpHelper.createSnmpGatewayCredentials("192.168.1.1", "public") />
+
+<!--- dump the credentials --->
+<cfdump var="#credentials#" />
+
+<!--- create the varbinds --->
+<cfset varbinds = snmpHelper.createSnmpGatewayVarbinds() />
+
+<cfset varbinds.add("1.3.6.1.2.1.1.3.0") />
+<cfset varbinds.add("1.3.6.1.2.1.1") />
+<cfset varbinds.add("1.3.6.1.2.1.1.5.0") />
+
+<!--- dump the varbinds --->
+<cfdump var="#varbinds#" />
+
+<!--- do a get request --->
+<cfset response = snmpHelper.snmpGatewayGet(credentials, varbinds) />
+
+<!--- dump the response --->
+<cfdump var="#response#" />
+
+<!--- output details --->
+<cfoutput>
+	<p>
+		durration: #response.getDuration()#<br />
+		errorIndex: #response.getErrorIndex()#<br />
+		errorStatus: #response.getErrorStatus()#<br />
+		requestType: #response.getRequestType()#<br />
+		responseVarbinds: #response.getResponseVarbinds()#<br />
+		start: #response.getStart()#<br />
+		synopsis: #response.getSynopsis()#<br />
+		target: #response.getTarget()#
+	</p>
+</cfoutput>
