@@ -4,9 +4,12 @@
 package com.esc.msu;
 
 import org.snmp4j.PDU;
+import org.snmp4j.smi.VariableBinding;
 
 import java.util.ArrayList;
 import java.util.Date;
+import java.util.HashMap;
+import java.util.Vector;
 
 /**
  * comprises a response for an SNMP gateway request
@@ -31,6 +34,7 @@ public class SnmpGatewayResponse {
 	 * @param requestVbs the set of requested variable bindings (varbinds)
 	 * @param response the response PDU received for the associated request
 	 */
+	@SuppressWarnings("unchecked")
 	public SnmpGatewayResponse(String requestType,
 							   long requestStart, long requestDuration,
 			                   String target,
@@ -100,17 +104,33 @@ public class SnmpGatewayResponse {
 	 * @return string containing the error-status text
 	 */
 	public String getErrorStatusText() {
-		return this.response.getErrorStatusText();
+		return (new String(this.response.getErrorStatusText() + " on " +
+				           this.requestVbs.get(this.response.getErrorIndex())));
 	}
 	
 	/**
-	 * get the response varbindlist as a display string
-	 * @return string containing a representation of the reponse varbindlist
+	 * get the response varbindlist as a HashMap<String(OID), String<Value)>
+	 * @return HashMap containing a representation of the response varbindlist
+	 *       NOTE- the varbind ordering in the HashMap may NOT be consistent
+	 *             with the ordering in the SNMP response PDU
 	 */
-	public String getResponseVarbinds() {
-		return this.response.getVariableBindings().toString();
+	@SuppressWarnings("unchecked")
+	public HashMap<String, String> getResponseVarbinds() {
+		HashMap<String, String> vbl = new HashMap<String, String>();
+		
+		Vector<VariableBinding> vbs = this.response.getVariableBindings();
+		for(VariableBinding vb : vbs) {
+			vbl.put(vb.getOid().toString(), vb.getVariable().toString());
+		}
+		return vbl;
 	}
 	
+	/**
+	 * get the synopsis of the Snmp Response.  This method uses the other
+	 * methods defined in this class
+	 * 
+	 * @return a String suitable for displaying the Snmp Response.
+	 */
 	public String getSynopsis() {
 		return new String(this.getRequestType() + " sent to " + this.getTarget() +
 				   "\n\t started at " + this.getStart() +

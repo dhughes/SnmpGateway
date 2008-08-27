@@ -36,7 +36,7 @@
 		errorIndex: #response.getErrorIndex()#<br />
 		errorStatus: #response.getErrorStatus()#<br />
 		requestType: #response.getRequestType()#<br />
-		responseVarbinds: #response.getResponseVarbinds()#<br />
+		<cfdump var="#response.getResponseVarbinds()#" />
 		start: #response.getStart()#<br />
 		synopsis: #response.getSynopsis()#<br />
 		target: #response.getTarget()#
