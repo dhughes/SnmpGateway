@@ -8,7 +8,7 @@
 <cfdump var="#snmpHelper#" />
 
 <!--- create the credentials --->
-<cfset credentials = snmpHelper.createCredentials("192.168.1.1", "public") />
+<cfset credentials = snmpHelper.createCredentials("10.0.1.1", "public") />
 
 <!--- dump the credentials --->
 <cfdump var="#credentials#" />

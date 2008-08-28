@@ -2,6 +2,7 @@ package com.esc.msu;
 
 import java.io.IOException;
 import java.util.ArrayList;
+import java.util.Vector;
 
 import org.snmp4j.PDU;
 import org.snmp4j.tools.console.SnmpRequest;
@@ -44,9 +45,12 @@ public class SnmpGatewayHelper implements GatewayHelper {
 	 */
 	private SnmpGatewayResponse snmpRequest(String type,
 												   SnmpGatewayCredentials cred,
-												   ArrayList<String> vbs) throws IOException {
+												   Vector<String> vbs) throws IOException {
 
-		ArrayList<String> args = extractArgs(type, cred, vbs);
+		// create an ArrayList from the vbs Vector
+		ArrayList<String> vbl = new ArrayList(vbs);
+		
+		ArrayList<String> args = extractArgs(type, cred, vbl);
 		
 		SnmpRequest sr = new SnmpRequest(args.toArray(new String[args.size()]));
 		long start = System.currentTimeMillis();
@@ -55,7 +59,7 @@ public class SnmpGatewayHelper implements GatewayHelper {
 		
 		SnmpGatewayResponse sgr = new SnmpGatewayResponse(type, start, duration,
 			                   cred.getTargetAddress(),
-			                   vbs, response);
+			                   vbl, response);
 		this.logger.info("response is: \n" + sgr.getSynopsis());
 		return sgr;
 	}
@@ -69,7 +73,7 @@ public class SnmpGatewayHelper implements GatewayHelper {
 	 * @throws IOException
 	 */
 	public SnmpGatewayResponse get(SnmpGatewayCredentials cred,
-											  ArrayList<String> vbs) throws IOException {
+											  Vector<String> vbs) throws IOException {
 
 		return this.snmpRequest("GET", cred, vbs);
 	}
@@ -85,7 +89,7 @@ public class SnmpGatewayHelper implements GatewayHelper {
 	 * @throws IOException
 	 */
 	public SnmpGatewayResponse getNext(SnmpGatewayCredentials cred,
-												ArrayList<String> vbs) throws IOException {
+												Vector<String> vbs) throws IOException {
 		
 		return this.snmpRequest("GETNEXT", cred, vbs);
 	}
