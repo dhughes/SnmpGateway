@@ -123,8 +123,11 @@ public class SnmpGatewayResponse {
 		String s;
 		
 		if (this.response != null) {
-		    s = new String(this.response.getErrorStatusText() + " on " +
-				           this.requestVbs.get(this.response.getErrorIndex()));
+		    s = new String(this.response.getErrorStatusText());
+		    if ((this.response.getErrorStatus() != 0)  &&
+		        (this.response.getErrorIndex()  >  0)) {
+		    	s = s.concat(" on " + this.requestVbs.get(this.response.getErrorIndex() -1));
+		    }
 		} else {
 			s = new String("no response was received");
 		}
@@ -137,16 +140,14 @@ public class SnmpGatewayResponse {
 	 *       NOTE- the varbind ordering in the HashMap may NOT be consistent
 	 *             with the ordering in the SNMP response PDU
 	 * <p>
-	 * @return failure null  (no response was received)
+	 * @return failure an empty HashMap  (no response was received)
 	 * <br>    success a HashMap containing a representation of the response varbindlist
 	 */
 	@SuppressWarnings("unchecked")
 	public HashMap<String, String> getResponseVarbinds() {
-		HashMap<String, String> vbl = null;
+		HashMap<String, String> vbl = new HashMap<String, String>();
 		
-		if (this.response != null) {
-			vbl = new HashMap<String, String>();
-		
+		if (this.response != null) {	
 			Vector<VariableBinding> vbs = this.response.getVariableBindings();
 			for(VariableBinding vb : vbs) {
 				vbl.put(vb.getOid().toString(), vb.getVariable().toString());
