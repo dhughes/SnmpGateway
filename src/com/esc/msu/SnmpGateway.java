@@ -7,7 +7,7 @@ import coldfusion.eventgateway.GatewayServices;
 import coldfusion.eventgateway.Logger;
 
 import java.io.IOException;
-import java.util.ArrayList;
+import java.util.Vector;
 
 import org.snmp4j.PDU;
 import org.snmp4j.tools.console.SnmpRequest;
@@ -34,6 +34,7 @@ public class SnmpGateway implements Gateway {
 	 * our instance of the Logger for log messages
 	 */
 	private Logger logger = null;
+	private boolean isLogging = true;
     /**
      * Listener CFC paths for our events
      */
@@ -46,10 +47,14 @@ public class SnmpGateway implements Gateway {
 	public SnmpGateway(String gatewayID, String config) {
 	      this.gatewayID = gatewayID;
 	      this.config = config;
-	      this.gatewayServices = GatewayServices.getGatewayServices();
-	      this.logger = this.gatewayServices.getLogger();
+	      if (isLogging) {
+	          this.gatewayServices = GatewayServices.getGatewayServices();
+	    	  this.logger = this.gatewayServices.getLogger();
+	      }
 	      this.status = Gateway.RUNNING;
-	      this.logger.info("Instantiating Gateway: " + this.gatewayID);
+	      if (isLogging) {
+	          this.logger.info("Instantiating Gateway: " + this.gatewayID);
+	      }
 	}
 
 	/**
@@ -92,7 +97,9 @@ public class SnmpGateway implements Gateway {
 			break;
 		}
 		
-		this.logger.info("Reporting Gateway Status: " + s);
+		if (isLogging) {
+		    this.logger.info("Reporting Gateway Status: " + s);
+		}
 		return this.status;
 	}
 	
@@ -144,7 +151,9 @@ public class SnmpGateway implements Gateway {
 	 */
 	public void start() {
 		this.status = Gateway.RUNNING;
-		this.logger.info("Starting Gateway: " + this.gatewayID);
+		if (isLogging) {
+		    this.logger.info("Starting Gateway: " + this.gatewayID);
+		}
 	}
 	
 	/**
@@ -152,25 +161,27 @@ public class SnmpGateway implements Gateway {
 	 */
 	public void stop() {
 		this.status = Gateway.STOPPED;
-		this.logger.info("Stopping Gateway: " + this.gatewayID);
+		if (isLogging) {
+		    this.logger.info("Stopping Gateway: " + this.gatewayID);
+		}
 	}
 
 	
-	/**
-	 * @param args not called with any parameters!
-	 
+/**
 	public static void main(String[] args) {
 		
 		SnmpGateway sg = new SnmpGateway("ColdFusion SnmpGateway", null);
-		SnmpGatewayCredentials cred = sg.createCredentials("192.168.1.220",
+		SnmpGatewayHelper sgh = (SnmpGatewayHelper )sg.getHelper();
+
+		SnmpGatewayCredentials cred = sgh.createCredentials("192.168.1.220",
 				                                                 "public");
 		cred.setTargetPort(1161);
-		ArrayList<String> vbl = new ArrayList<String>();
+		Vector<String> vbl = new Vector<String>();
 		vbl.add("1.3.6.1.2.1.1.3.0");
 		vbl.add("1.3.6.1.2.1.1");
 		
 		try {
-			SnmpGatewayResponse sgr = sg.get(cred, vbl);
+			SnmpGatewayResponse sgr = sgh.get(cred, vbl);
 			System.out.println(sgr.getSynopsis());
 		} catch (IOException e) {
 			// TODO Auto-generated catch block
@@ -183,16 +194,16 @@ public class SnmpGateway implements Gateway {
 		vbl.add("1.3.6.1.2.1.8");
 		
 		try {
-			SnmpGatewayResponse sgr = sg.getNext(cred, vbl);
+			SnmpGatewayResponse sgr = sgh.getNext(cred, vbl);
 			System.out.println(sgr.getSynopsis());
 		} catch (IOException e) {
 			// TODO Auto-generated catch block
 			e.printStackTrace();
 		}
 	}
-	*/
 
 
+**/
 
 
 }

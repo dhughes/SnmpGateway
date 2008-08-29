@@ -23,14 +23,17 @@ public class SnmpGatewayHelper implements GatewayHelper {
 	 * our instance of the Logger for log messages
 	 */
 	private Logger logger = null;
+	private boolean isLogging = true;
 	
 	public SnmpGatewayHelper(String gatewayID) {
 		
 		this.gatewayID = gatewayID;
 		
 		this.gatewayServices = GatewayServices.getGatewayServices();
-	    this.logger = this.gatewayServices.getLogger(this.gatewayID + "-helper");
-	    this.logger.info("Instantiating " + this.gatewayID + "-helper");
+	    if (isLogging) {
+		    this.logger = this.gatewayServices.getLogger(this.gatewayID + "-helper");
+	        this.logger.info("Instantiating " + this.gatewayID + "-helper");
+	    }
 	}
 	
 	/**
@@ -47,20 +50,20 @@ public class SnmpGatewayHelper implements GatewayHelper {
 												   SnmpGatewayCredentials cred,
 												   Vector<String> vbs) throws IOException {
 
-		// create an ArrayList from the vbs Vector
-		ArrayList<String> vbl = new ArrayList(vbs);
-		
-		ArrayList<String> args = extractArgs(type, cred, vbl);
+		Vector<String> args = extractArgs(type, cred, vbs);
 		
 		SnmpRequest sr = new SnmpRequest(args.toArray(new String[args.size()]));
+		
 		long start = System.currentTimeMillis();
 		PDU response = sr.send();
 		long duration = System.currentTimeMillis() - start;
 		
 		SnmpGatewayResponse sgr = new SnmpGatewayResponse(type, start, duration,
 			                   cred.getTargetAddress(),
-			                   vbl, response);
-		this.logger.info("response is: \n" + sgr.getSynopsis());
+			                   vbs, response);
+		if (isLogging) {
+		    this.logger.info("response is: \n" + sgr.getSynopsis());
+		}
 		return sgr;
 	}
 	/**
@@ -105,9 +108,9 @@ public class SnmpGatewayHelper implements GatewayHelper {
 	 * @return an ArrayList<String> containing the set of calling arguments
 	 *         to pass to SnmpRequest
 	 */
-	private ArrayList<String> extractArgs(String pdu, SnmpGatewayCredentials cred, 	
-										   ArrayList<String> vbs) {
-		ArrayList<String> args = new ArrayList<String>();
+	private Vector<String> extractArgs(String pdu, SnmpGatewayCredentials cred, 	
+										   Vector<String> vbs) {
+		Vector<String> args = new Vector<String>();
 		
 		// turn off log4j output
 		args.add("-d");		

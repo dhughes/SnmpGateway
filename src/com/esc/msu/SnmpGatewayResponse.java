@@ -6,7 +6,7 @@ package com.esc.msu;
 import org.snmp4j.PDU;
 import org.snmp4j.smi.VariableBinding;
 
-import java.util.ArrayList;
+import java.util.Vector;
 import java.util.Date;
 import java.util.HashMap;
 import java.util.Vector;
@@ -21,7 +21,7 @@ public class SnmpGatewayResponse {
 	private final long requestDuration;
 	private final String target;
 	private final PDU response;	
-	private final ArrayList<String> requestVbs;
+	private final Vector<String> requestVbs;
 	
 	/**
 	 * construct a response for an SNMP gateway request
@@ -38,14 +38,14 @@ public class SnmpGatewayResponse {
 	public SnmpGatewayResponse(String requestType,
 							   long requestStart, long requestDuration,
 			                   String target,
-			                   ArrayList<String> requestVbs,
+			                   Vector<String> requestVbs,
 			                   PDU response) {
 		
 		this.requestType = new String(requestType);
 		this.requestStart = new Date(requestStart);
 		this.requestDuration = requestDuration;
 		this.target = new String(target);
-		this.requestVbs = (ArrayList<String> )requestVbs.clone();
+		this.requestVbs = (Vector<String> )requestVbs.clone();
 		this.response = response;	
 	}
 
@@ -82,45 +82,75 @@ public class SnmpGatewayResponse {
 	}
 	
 	/**
-	 * get the response error-index.  This value identifies which
+	 * get the response error-index.  
+	 * <p>
+	 * This value identifies which
 	 * request varbind is associated with the error-status.  The first
 	 * varbind index is 1.
-	 * @return the response error-index
+	 * <p>
+	 * @return failure -1 (no response was received)
+	 * <br>    success the response error-index
 	 */
 	public int getErrorIndex() {
-		return this.response.getErrorIndex();
+		int e = -1;
+		if (this.response != null) {
+			e = this.response.getErrorIndex();
+		}
+		return e;
 	}
 	
 	/**
-	 * get the response error-status 
-	 * @return the response error-status
+	 * get the response error-status .
+	 * <p>
+	 * @return 	failure -1 (no response was received)
+	 * <br>     success the response error-status
 	 */
 	public int getErrorStatus() {
-		return this.response.getErrorStatus();
+		int e = -1;
+		if (this.response != null) {
+			e = this.response.getErrorStatus();
+		}
+		return e;
 	}
 	
 	/**
 	 * get the text associated with the response error-status
-	 * @return string containing the error-status text
+	 * <p>
+	 * @return failure the string "no response was received"
+	 *  <br>   success string containing the error-status text
 	 */
 	public String getErrorStatusText() {
-		return (new String(this.response.getErrorStatusText() + " on " +
-				           this.requestVbs.get(this.response.getErrorIndex())));
+		String s;
+		
+		if (this.response != null) {
+		    s = new String(this.response.getErrorStatusText() + " on " +
+				           this.requestVbs.get(this.response.getErrorIndex()));
+		} else {
+			s = new String("no response was received");
+		}
+		return s;
 	}
 	
 	/**
 	 * get the response varbindlist as a HashMap<String(OID), String<Value)>
-	 * @return HashMap containing a representation of the response varbindlist
+	 * <p>
 	 *       NOTE- the varbind ordering in the HashMap may NOT be consistent
 	 *             with the ordering in the SNMP response PDU
+	 * <p>
+	 * @return failure null  (no response was received)
+	 * <br>    success a HashMap containing a representation of the response varbindlist
 	 */
 	@SuppressWarnings("unchecked")
 	public HashMap<String, String> getResponseVarbinds() {
-		HashMap<String, String> vbl = new HashMap<String, String>();
+		HashMap<String, String> vbl = null;
 		
-		Vector<VariableBinding> vbs = this.response.getVariableBindings();
-		for(VariableBinding vb : vbs) {
-			vbl.put(vb.getOid().toString(), vb.getVariable().toString());
+		if (this.response != null) {
+			vbl = new HashMap<String, String>();
+		
+			Vector<VariableBinding> vbs = this.response.getVariableBindings();
+			for(VariableBinding vb : vbs) {
+				vbl.put(vb.getOid().toString(), vb.getVariable().toString());
+			}
 		}
 		return vbl;
 	}
