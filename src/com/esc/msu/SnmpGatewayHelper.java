@@ -1,20 +1,23 @@
 package com.esc.msu;
 
 import java.io.IOException;
-import java.util.ArrayList;
 import java.util.Vector;
 
 import org.snmp4j.PDU;
 import org.snmp4j.tools.console.SnmpRequest;
 
-import coldfusion.eventgateway.Gateway;
+//import coldfusion.eventgateway.Gateway;
 import coldfusion.eventgateway.GatewayHelper;
 import coldfusion.eventgateway.GatewayServices;
 import coldfusion.eventgateway.Logger;
 
 public class SnmpGatewayHelper implements GatewayHelper {
 
-	private String gatewayID;
+	/**
+	 * The gateway this class is helping
+	 */
+	private SnmpGateway gateway;
+	
 	/**
 	 * The handle to the CF gateway service
 	 */
@@ -23,16 +26,16 @@ public class SnmpGatewayHelper implements GatewayHelper {
 	 * our instance of the Logger for log messages
 	 */
 	private Logger logger = null;
-	private boolean isLogging = true;
+	private boolean isLogging = false;
 	
-	public SnmpGatewayHelper(String gatewayID) {
+	public SnmpGatewayHelper(SnmpGateway gateway) {
 		
-		this.gatewayID = gatewayID;
+		this.gateway = gateway;
 		
 		this.gatewayServices = GatewayServices.getGatewayServices();
 	    if (isLogging) {
-		    this.logger = this.gatewayServices.getLogger(this.gatewayID + "-helper");
-	        this.logger.info("Instantiating " + this.gatewayID + "-helper");
+		    this.logger = this.gatewayServices.getLogger(this.gateway.getGatewayID() + "-helper");
+	        this.logger.info("Instantiating " + this.gateway.getGatewayID() + "-helper");
 	    }
 	}
 	
@@ -47,8 +50,8 @@ public class SnmpGatewayHelper implements GatewayHelper {
 	 * @throws IOException
 	 */
 	private SnmpGatewayResponse snmpRequest(String type,
-												   SnmpGatewayCredentials cred,
-												   Vector<String> vbs) throws IOException {
+										    SnmpGatewayCredentials cred, 
+										    Vector<String> vbs) throws IOException {
 
 		Vector<String> args = extractArgs(type, cred, vbs);
 		
@@ -66,6 +69,7 @@ public class SnmpGatewayHelper implements GatewayHelper {
 		}
 		return sgr;
 	}
+	
 	/**
 	 * invoke an SNMP Get-Request
 	 * 
@@ -80,7 +84,6 @@ public class SnmpGatewayHelper implements GatewayHelper {
 
 		return this.snmpRequest("GET", cred, vbs);
 	}
-	
 	
 	/**
 	 * invoke an SNMP GetNext-Request
@@ -144,5 +147,18 @@ public class SnmpGatewayHelper implements GatewayHelper {
 	public SnmpGatewayCredentials createCredentials(String target, String community) {
 		return new SnmpGatewayCredentials(target, community);
 	}
+	
+    public String getEventListenerAddress() {
+    	return this.gateway.getEventListenerAddress();
+    }
+    public void setEventListenerAddress(String l) {
+    	this.gateway.setEventListenerAddress(l);
+    }
+    public String getEventListenerPort() {
+    	return this.gateway.getEventListenerPort();
+    }
+    public void setEventListenerPort(String p) {
+    	this.gateway.setEventListenerPort(p);
+    } 
 	
 }

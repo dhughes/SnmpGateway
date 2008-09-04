@@ -9,7 +9,6 @@ import org.snmp4j.smi.VariableBinding;
 import java.util.Vector;
 import java.util.Date;
 import java.util.HashMap;
-import java.util.Vector;
 
 /**
  * comprises a response for an SNMP gateway request
