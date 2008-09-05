@@ -26,7 +26,7 @@ public class SnmpGatewayHelper implements GatewayHelper {
 	 * our instance of the Logger for log messages
 	 */
 	private Logger logger = null;
-	private boolean isLogging = false;
+	private boolean isLogging = true;
 	
 	public SnmpGatewayHelper(SnmpGateway gateway) {
 		

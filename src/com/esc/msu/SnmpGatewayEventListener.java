@@ -112,9 +112,6 @@ public class SnmpGatewayEventListener extends SnmpRequest implements Runnable {
 		    e.setProcessed(true);
 			if ((command.getType() == PDU.TRAP)   ||
 				(command.getType() == PDU.V1TRAP)) {
-			    System.out.println("This is the SnmpGatewayEventLister Class...");
-		        System.out.println(command.toString());
-		        
 		        this.sg.inboundMessage(new SnmpGatewayEvent(e));
 		    }
 		}

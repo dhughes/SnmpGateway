@@ -3,7 +3,10 @@ package com.esc.msu;
 import org.snmp4j.CommandResponderEvent;
 import org.snmp4j.PDU;
 import org.snmp4j.PDUv1;
+import org.snmp4j.security.SecurityModel;
+import org.snmp4j.smi.SMIConstants;
 import org.snmp4j.smi.OID;
+import org.snmp4j.smi.Variable;
 import org.snmp4j.smi.VariableBinding;
 
 import java.util.Date;
@@ -58,7 +61,7 @@ public class SnmpGatewayEvent {
 	 * @return a HashMap containing a representation of the event notification varbindlist
 	 */
 	@SuppressWarnings("unchecked")
-	public HashMap<String, String> getResponseVarbinds() {
+	public HashMap<String, String> getEventVarbinds() {
 		HashMap<String, String> vbl = new HashMap<String, String>();
 		
 		if (this.pdu != null) {	
@@ -75,14 +78,20 @@ public class SnmpGatewayEvent {
 	 * @return  the version for this SNMP Event Notification
 	 */
 	public String getEventVersion() {
-		String v = "PDU is missing";
+		String v = "";
 		
-		switch(this.pduType) {
-		case PDU.NOTIFICATION:
-			v = new String("SNMPv2c/3 Notification");
+		switch(this.event.getSecurityModel()) {
+		case SecurityModel.SECURITY_MODEL_ANY:
+			v = new String("Security model undefined");
 			break;
-		case PDU.V1TRAP:
+		case SecurityModel.SECURITY_MODEL_SNMPv1:
 			v = new String("SNMP v1 Trap");
+			break;
+		case SecurityModel.SECURITY_MODEL_SNMPv2c:
+			v = new String("SNMP v2c Notification");
+			break;
+		case SecurityModel.SECURITY_MODEL_USM:
+			v = new String("SNMP v3 Notification");
 			break;
 		}
 
@@ -162,19 +171,22 @@ public class SnmpGatewayEvent {
 		for (VariableBinding vb: vbs) {
 			OID o = vb.getOid();
 			if (o.startsWith(SnmpGatewayEvent.snmpTrapOID)  && (o.size() == SnmpGatewayEvent.snmpTrapOID.size())) {
-				OID type = new OID(vb.getOid());
-				if (type.startsWith(SnmpGatewayEvent.snmpGenericPrefix) && (type.size() == SnmpGatewayEvent.snmpGenericPrefix.size() + 1)) {
-					int g = type.last();
-				    t = this.getGenericEventString(g);
-				} else {
-					if (type.get(type.size() - 2) == 0) {
-					    // enterprise specific
-					    int s = type.last();
-					    type.trim(2);  
-					    t = new String("Enterprise(" + type.toString() + ")  specific(" + s + ")");
+				Variable v = vb.getVariable();
+				if (v.getSyntax() == SMIConstants.SYNTAX_OBJECT_IDENTIFIER) {
+					OID type = new OID(v.toString());
+					if (type.startsWith(SnmpGatewayEvent.snmpGenericPrefix) && (type.size() == SnmpGatewayEvent.snmpGenericPrefix.size() + 1)) {
+						int g = type.last();
+				    	t = this.getGenericEventString(g);
+					} else {
+						if (type.get(type.size() - 2) == 0) {
+					    	// enterprise specific
+					    	int s = type.last();
+					    	type.trim(2);  
+					    	t = new String("Enterprise(" + type.toString() + ")  specific(" + s + ")");
+						}
 					}
+					break;
 				}
-				break;
 			}
 		}
 		
@@ -247,5 +259,18 @@ public class SnmpGatewayEvent {
 			
 		}
 		return t;
+	}
+	
+	public String getCommunityString() {
+		return this.getSecurityName();
+	}
+	
+	public String getSecurityName() {
+		String s = new String(this.event.getSecurityName());
+		return s;
+	}
+	
+	public String getRequestId() {
+		return this.pdu.getRequestID().toString();
 	}
 }
