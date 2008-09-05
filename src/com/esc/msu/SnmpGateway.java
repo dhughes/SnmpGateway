@@ -17,8 +17,10 @@ import java.util.concurrent.ExecutorService;
 
 
 /**
- * ColdFusion gateway to provide interaction with the
- * org.snmp4j.tools.console.SnmpRequest class
+ * ColdFusion gateway providing support for
+ * listening for SNMP event notifications and
+ * passing them along to the specified set of
+ * CFC listeners.
  */
 public class SnmpGateway implements Gateway {
 

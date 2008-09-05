@@ -11,6 +11,10 @@ import coldfusion.eventgateway.GatewayHelper;
 import coldfusion.eventgateway.GatewayServices;
 import coldfusion.eventgateway.Logger;
 
+/**
+ * ColdFusion gateway helper supporting SNMP get and getNext
+ * operations
+ */
 public class SnmpGatewayHelper implements GatewayHelper {
 
 	/**

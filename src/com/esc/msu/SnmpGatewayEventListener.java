@@ -31,7 +31,7 @@ import org.snmp4j.util.MultiThreadedMessageDispatcher;
 import org.snmp4j.util.ThreadPool;
 
 /**
- * @author ellison
+ * The SNMP Gateway listener for SNMP event notifications
  *
  */
 public class SnmpGatewayEventListener extends SnmpRequest implements Runnable {
@@ -42,15 +42,22 @@ public class SnmpGatewayEventListener extends SnmpRequest implements Runnable {
     private Snmp snmp;
     private OctetString localEngineID = new OctetString(MPv3.createLocalEngineID());
 
+
     /**
-	 * @param arg0
-	 */
+     * constructor for the SNMP Gateway event listener
+     * @param sg reference to the SNMP Gateway instance
+     * @param arg0 the command line options for the underlying org.snmp4j.tools.console.SnmpReqeust class
+     */
 	public SnmpGatewayEventListener(SnmpGateway sg, String[] arg0) {
 		super(arg0);
 		// TODO Auto-generated constructor stub
 		this.sg = sg;
 	}
-	
+
+	/**
+	 * override class for adding a USM user
+	 * @param snmp
+	 */
 	private void addUsmUser(Snmp snmp) {
 		  snmp.getUSM().addUser(getSecurityName(), new UsmUser(getSecurityName(),
 		                                                       getAuthProtocol(),
@@ -59,6 +66,9 @@ public class SnmpGatewayEventListener extends SnmpRequest implements Runnable {
 		                                                       getPrivPassphrase()));
 	}
 	
+	/**
+	 * override class for establishing the event listener
+	 */
 	public synchronized void listen() throws IOException {
 
 		if (this.getAddress() instanceof TcpAddress) {
@@ -106,6 +116,9 @@ public class SnmpGatewayEventListener extends SnmpRequest implements Runnable {
 	}
 
 
+	/**
+	 * override class for procesing an incoming SNMP message
+	 */
 	public synchronized void processPdu(CommandResponderEvent e) {
 		PDU command = e.getPDU();
 		if (command != null) {
@@ -117,6 +130,9 @@ public class SnmpGatewayEventListener extends SnmpRequest implements Runnable {
 		}
 	}
 
+	/**
+	 * start listening for SNMP event notifications
+	 */
 	public void run() {
 		try {
 			this.listen();
@@ -126,6 +142,9 @@ public class SnmpGatewayEventListener extends SnmpRequest implements Runnable {
 		}
 	}
 	
+	/**
+	 * stop listening for SNMP event notifications and reliquish system resources
+	 */
 	public void stop() {
 		this.threadPool.interrupt();
 		try {

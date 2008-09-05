@@ -13,6 +13,10 @@ import java.util.Date;
 import java.util.HashMap;
 import java.util.Vector;
 
+/**
+ * comprises an SNMP event notification received by the SNMP Gateway event listener
+ *
+ */
 public class SnmpGatewayEvent {
 
 	private final CommandResponderEvent event;
