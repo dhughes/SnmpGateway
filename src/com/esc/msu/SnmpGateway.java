@@ -27,7 +27,7 @@ public class SnmpGateway implements Gateway {
 	/**
 	 * String identifying the gateway type
 	 */
-	private final static String gatewayType = new String("SnmpGateway");
+	private final static String gatewayType = "SnmpGateway";
 	/**
 	 * ID provided by EventService
 	 */
@@ -56,11 +56,8 @@ public class SnmpGateway implements Gateway {
      * ColdFusion Gateway status
      */
     private int status = Gateway.STOPPED;
-    /**
-     * the identifier associated with a particular event
-     */
-    private int eventId = 1;
-    /** CFC function to call when SNMP Gateway event listener
+    /** 
+     * CFC function to call when SNMP Gateway event listener
      * receives an SNMP event notification
      */
     private String eventFunction;
@@ -93,13 +90,16 @@ public class SnmpGateway implements Gateway {
 	public SnmpGateway(String gatewayID, String config) {
 	    this.gatewayID = gatewayID;
 	    this.config    = config;
-        if (config != null) {
-        	this.loadConfig();
-        }
+
 	    if (isLogging) {
 	        this.gatewayServices = GatewayServices.getGatewayServices();
 	    	this.logger = this.gatewayServices.getLogger();
 	    }
+	    
+        if (config != null) {
+        	this.loadConfig();  // requires logger
+        }
+        
         this.status = Gateway.STARTING;
 	    if (isLogging) {
 	        this.logger.info("Starting Gateway: " + this.gatewayID);
@@ -107,7 +107,7 @@ public class SnmpGateway implements Gateway {
 	}
 	
 	/**
-     * Constructor for the SnmpGateway service
+     * Constructor for the SnmpGateway service - used for testing from main()
      * 
      * @param gatewayID the CF identifier for this gateway
      * @param config the path and configuration file name (if any)
@@ -133,9 +133,9 @@ public class SnmpGateway implements Gateway {
      * Load the properties file to get our settings
      */
     private void loadConfig() throws ServiceRuntimeException {
-
+		
     	if (isLogging) {
-            logger.info(this.gatewayType + " (" + this.gatewayID + 
+            logger.info(SnmpGateway.gatewayType + " (" + this.gatewayID + 
             		    ") Initializing gateway with configuration file: " + this.config);
     	}
         Properties properties = new Properties();
@@ -145,7 +145,7 @@ public class SnmpGateway implements Gateway {
             properties.load(propsFile);
             propsFile.close();
         } catch (IOException e) {
-            String error = this.gatewayType + " (" + this.gatewayID + ") Unable to load configuration file: " + this.config;
+            String error = SnmpGateway.gatewayType + " (" + this.gatewayID + ") Unable to load configuration file: " + this.config;
             throw new ServiceRuntimeException(error, e);
         }
 
@@ -155,7 +155,6 @@ public class SnmpGateway implements Gateway {
     	this.eventListenerPort = properties.getProperty("listener_port", "162");
         // Event functions
         this.eventFunction = properties.getProperty("event_function", "onEvent");
-
     }
 
 	/**
@@ -302,7 +301,7 @@ public class SnmpGateway implements Gateway {
 	public void inboundMessage(SnmpGatewayEvent e) {
 		
 		if (this.eventFunction != null && this.eventFunction.trim().length() > 0) {
-
+			/*
 		    if (!this.isLogging) {
 		    	System.out.println("Received event at: " + e.getTimeReceived() + " from " + e.getSender());
 		    	System.out.println("\t sender version: " + e.getEventVersion());
@@ -311,15 +310,22 @@ public class SnmpGateway implements Gateway {
 		    	System.out.println("\t request ID: " + e.getRequestId());
 		    	System.out.println("\t event type: " + e.getEventType());
 		    	System.out.println("\t event varbinds: " + e.getEventVarbinds().toString());
-		    }
+		    }*/
 
 		    // populate the CFEvent class
 		    CFEvent event = new CFEvent(this.gatewayID);  // use our gatewayID
 		    event.setCfcMethod(this.eventFunction);		  // set the function to call in the CFC
 
-		    Hashtable<String, SnmpGatewayEvent> eventData = new Hashtable<String, SnmpGatewayEvent>(); // create the data map
-		    String eventKey = new String("EVENT-" + this.eventId++); 	// create a map key
-		    eventData.put(eventKey, e);  								// place the SNMP event notification into the data map
+		    Hashtable<String, Object> eventData = new Hashtable<String, Object>(); // create the data map
+		    eventData.put("CommunityString", e.getCommunityString());  	
+		    eventData.put("EventTimeStamp",  e.getEventTimeStamp());
+		    eventData.put("EventType",       e.getEventType()); 
+		    eventData.put("EventVarbinds",   e.getEventVarbinds()); 
+		    eventData.put("EventVersion",    e.getEventVersion());
+		    eventData.put("RequestId",       e.getRequestId());
+		    eventData.put("Sender",          e.getSender());
+		    eventData.put("TimeReceived",    e.getTimeReceived());
+		    
 		    event.setData(eventData);    								// place the data map into the CFEvent class
 		    event.setGatewayType(SnmpGateway.gatewayType);  			// set our gateway type
 		    event.setOriginatorID("");									// set the event originator
@@ -343,9 +349,6 @@ public class SnmpGateway implements Gateway {
      */
 	public void restart() {
         this.stop();
-        if (this.config != null) {
-        	this.loadConfig();
-        }
         this.start();
 	}
 	
@@ -379,6 +382,9 @@ public class SnmpGateway implements Gateway {
 	 * the SNMP Gateway status to the RUNNING state
 	 */
 	public void start() {
+        if (this.config != null) {
+        	this.loadConfig();
+        }
 	    if (this.startEventListener()) {
 	  		this.status = Gateway.RUNNING;
 	        if (isLogging) {
@@ -407,7 +413,8 @@ public class SnmpGateway implements Gateway {
 		}
 	}
 
-/*
+
+	/*
 	public static void main(String[] args) {
 		
 		SnmpGateway sg = new SnmpGateway("ColdFusion SnmpGateway", "./config/SnmpGateway.cfg", false);
