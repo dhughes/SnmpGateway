@@ -8,7 +8,7 @@
 			<cfdump var="#arguments.CFEvent#" />
 		</cfsavecontent>
 		
-		<cffile action="write" file="#expandPath("dump/dump#TimeFormat(now(), "hhmmss")#.html")#" output="#dump#" />
+		<cffile action="write" file="#expandPath("dump/dump#CreateUuid()#.html")#" output="#dump#" />
 		
 		<cflog text="Incomming Message Received" />
 	</cffunction>
