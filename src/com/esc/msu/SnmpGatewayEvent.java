@@ -89,13 +89,13 @@ public class SnmpGatewayEvent {
 			v = new String("Security model undefined");
 			break;
 		case SecurityModel.SECURITY_MODEL_SNMPv1:
-			v = new String("SNMP v1 Trap");
+			v = new String("SNMP v1 " + PDU.getTypeString(this.pduType));
 			break;
 		case SecurityModel.SECURITY_MODEL_SNMPv2c:
-			v = new String("SNMP v2c Notification");
+			v = new String("SNMP v2c " + PDU.getTypeString(this.pduType));
 			break;
 		case SecurityModel.SECURITY_MODEL_USM:
-			v = new String("SNMP v3 Notification");
+			v = new String("SNMP v3 " + PDU.getTypeString(this.pduType));
 			break;
 		}
 
@@ -111,6 +111,7 @@ public class SnmpGatewayEvent {
 		
 		switch(this.pduType) {
 		case PDU.NOTIFICATION:
+		case PDU.INFORM:
 			v = this.getNotificationTimeStamp();
 			break;
 		case PDU.V1TRAP:
@@ -130,12 +131,14 @@ public class SnmpGatewayEvent {
 		
 		switch(this.pduType) {
 		case PDU.NOTIFICATION:
+		case PDU.INFORM:
 			v = this.getNotificationType();
 			break;
 		case PDU.V1TRAP:
 			v = this.getTrapType();
 			break;
 		}
+		
 		return v;
 	}
 

@@ -96,7 +96,7 @@ public class SnmpGateway implements Gateway {
 	    	this.logger = this.gatewayServices.getLogger();
 	    }
 	    
-        if (config != null) {
+        if (this.config != null) {
         	this.loadConfig();  // requires logger
         }
         
@@ -117,13 +117,14 @@ public class SnmpGateway implements Gateway {
 	    this.config    = config;
 	    this.isLogging = isLogging;
 
-        if (config != null) {
-        	this.loadConfig();
-        }
 	    if (isLogging) {
 	        this.gatewayServices = GatewayServices.getGatewayServices();
 	    	this.logger = this.gatewayServices.getLogger();
 	    }
+	    
+        if (this.config != null) {
+        	this.loadConfig();
+        }
         this.status = Gateway.STARTING;
 	    if (isLogging) {
 	        this.logger.info("Starting Gateway: " + this.gatewayID);
@@ -294,6 +295,17 @@ public class SnmpGateway implements Gateway {
 	}
 	
 	/**
+	 * convenience routine to log warnings from SnmpGateway classes
+	 * 
+	 * @param s Warning message
+	 */
+	public synchronized void logWarn(String s) {
+		if (isLogging) {
+			this.logger.warn(s);
+		}
+	}
+	
+	/**
 	 * package up and send along an SNMP event notification to CFC listeners
 	 * 
 	 * @param e  the SNMP event notification 
@@ -301,6 +313,7 @@ public class SnmpGateway implements Gateway {
 	public void inboundMessage(SnmpGatewayEvent e) {
 		
 		if (this.eventFunction != null && this.eventFunction.trim().length() > 0) {
+			
 			/*
 		    if (!this.isLogging) {
 		    	System.out.println("Received event at: " + e.getTimeReceived() + " from " + e.getSender());
@@ -310,7 +323,8 @@ public class SnmpGateway implements Gateway {
 		    	System.out.println("\t request ID: " + e.getRequestId());
 		    	System.out.println("\t event type: " + e.getEventType());
 		    	System.out.println("\t event varbinds: " + e.getEventVarbinds().toString());
-		    }*/
+		    }
+		    */
 
 		    // populate the CFEvent class
 		    CFEvent event = new CFEvent(this.gatewayID);  // use our gatewayID
@@ -413,8 +427,8 @@ public class SnmpGateway implements Gateway {
 		}
 	}
 
+/*
 
-	/*
 	public static void main(String[] args) {
 		
 		SnmpGateway sg = new SnmpGateway("ColdFusion SnmpGateway", "./config/SnmpGateway.cfg", false);

@@ -9,12 +9,14 @@ import org.snmp4j.CommandResponderEvent;
 import org.snmp4j.CommunityTarget;
 import org.snmp4j.MessageDispatcher;
 import org.snmp4j.MessageDispatcherImpl;
+import org.snmp4j.MessageException;
 import org.snmp4j.PDU;
 import org.snmp4j.Snmp;
 import org.snmp4j.mp.MPv1;
 import org.snmp4j.mp.MPv2c;
 import org.snmp4j.mp.MPv3;
 import org.snmp4j.mp.SnmpConstants;
+import org.snmp4j.mp.StatusInformation;
 import org.snmp4j.security.Priv3DES;
 import org.snmp4j.security.SecurityModels;
 import org.snmp4j.security.SecurityProtocols;
@@ -122,13 +124,50 @@ public class SnmpGatewayEventListener extends SnmpRequest implements Runnable {
 	public synchronized void processPdu(CommandResponderEvent e) {
 		PDU command = e.getPDU();
 		if (command != null) {
-		    e.setProcessed(true);
+		    //e.setProcessed(true);
 			if ((command.getType() == PDU.TRAP)   ||
-				(command.getType() == PDU.V1TRAP)) {
+				(command.getType() == PDU.V1TRAP) ||
+				(command.getType() == PDU.INFORM)) {
+		        //this.sg.inboundMessage(new SnmpGatewayEvent(e));
+		        if (command.getType() == PDU.INFORM) {
+		            // try to send INFORM response
+		            try {
+		                sendInformResponse(e);
+		            } catch (MessageException mex) {
+		                this.sg.logWarn("Failed to send response on INFORM PDU event (" +
+		                    	        e + "): " + mex.getMessage());
+		            }
+		        }
 		        this.sg.inboundMessage(new SnmpGatewayEvent(e));
+			    e.setProcessed(true);
 		    }
 		}
 	}
+
+    /**
+     * send a RESPONSE PDU to the source address of an INFORM notification.
+     * 
+     * This method was adapted from org.snmp4j.Snmp.sendInformResponse()
+     * 
+     * @param event
+     *    the <code>CommandResponderEvent</code> with the INFORM request.
+     * @throws
+     *    MessageException if the response could not be created and sent.
+     */
+    private void sendInformResponse(CommandResponderEvent e) throws MessageException {
+        PDU r = (PDU) e.getPDU().clone();
+        r.setType(PDU.RESPONSE);
+        r.setErrorStatus(PDU.noError);
+        r.setErrorIndex(0);
+        e.getMessageDispatcher().returnResponsePdu(e.getMessageProcessingModel(),
+                                          		   e.getSecurityModel(),
+                                        		   e.getSecurityName(),
+                                        		   e.getSecurityLevel(),
+                                        		   r,
+                                        		   e.getMaxSizeResponsePDU(),
+                                        		   e.getStateReference(),
+                                        		   new StatusInformation());
+    }
 
 	/**
 	 * start listening for SNMP event notifications
