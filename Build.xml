@@ -1,0 +1,7 @@
+<project name="SNMP" default="zip">
+	
+	<target name="zip">
+		<zip destfile="SNMPGateway.zip" basedir="." />
+	</target>
+	
+</project>
